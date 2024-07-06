@@ -29,7 +29,7 @@ jobs:
         GOOS: ${{ matrix.os }}
         GOARCH: amd64
         CGO_ENABLED: "0"
-      run: go build -trimpath -ldflags '-s -w' cmd/ -o bin/dnsregion-${{ matrix.os }}-amd64${{ matrix.os == 'windows' && '.exe' || '' }}
+      run: go build -trimpath -ldflags '-s -w' -o bin/dnsregion-${{ matrix.os }}-amd64${{ matrix.os == 'windows' && '.exe' || '' }} cmd/*.go
 
     - name: Upload binaries to release
       uses: actions/upload-artifact@v4
