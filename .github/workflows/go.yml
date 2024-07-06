@@ -31,11 +31,10 @@ jobs:
         CGO_ENABLED: "0"
       run: go build -trimpath -ldflags '-s -w' -o bin/dnsregion-${{ matrix.os }}-amd64${{ matrix.os == 'windows' && '.exe' || '' }} cmd/*.go
 
-    - name: Upload binaries to release
-      uses: actions/upload-artifact@v4
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    - name: Release
+      uses: softprops/action-gh-release@v2
       with:
         name: dnsregion-${{ matrix.os }}-amd64${{ matrix.os == 'windows' && '.exe' || '' }}
-        path: bin/dnsregion-${{ matrix.os }}-amd64${{ matrix.os == 'windows' && '.exe' || '' }}
+        files: bin/dnsregion-${{ matrix.os }}-amd64${{ matrix.os == 'windows' && '.exe' || '' }}
+        token: ${{ secrets.TOKEN }}
 
