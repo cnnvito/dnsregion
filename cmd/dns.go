@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"os"
 
 	pkg "github.com/cnnvito/dnsregion"
 	"github.com/spf13/cobra"
@@ -20,49 +20,26 @@ var dnsCmd = &cobra.Command{
 		qtype, _ := cmd.Flags().GetString("type")
 		subnet, _ := cmd.Flags().GetString("subnet")
 
-		s := strings.Builder{}
-
-		s.WriteString("DNS SERVER: ")
-		s.WriteString(queryClient.DnsClient.GetServer())
-		s.WriteString("\n")
+		fmt.Fprintf(os.Stdout, "DNS SERVER: %s\n", queryClient.DnsClient.GetServer())
 
 		for _, domain := range args {
 			var result pkg.DnsRegionResult
 
-			s.WriteString("\n")
-			s.WriteString("* ")
-			s.WriteString(domain)
-
+			fmt.Fprintf(os.Stdout, "\n* %s", domain)
 			if subnet == "" {
 				result = queryClient.Query(domain, qtype)
 			} else {
 				result = queryClient.QueryWithSubnet(domain, qtype, subnet)
-				s.WriteString(" (edns_client_subnet: ")
-				s.WriteString(subnet)
-				s.WriteString(")")
+				fmt.Fprintf(os.Stdout, " (edns_client_subnet: %s)", subnet)
 			}
-
-			s.WriteString("\n")
+			fmt.Fprintf(os.Stdout, "\n")
 			for _, r := range result.Info {
-				s.WriteString("|- ")
-				s.WriteString(r.IP)
-				s.WriteString("\t")
-				s.WriteString(r.Country)
-				s.WriteString("|")
-				s.WriteString(r.Region)
-				s.WriteString("|")
-				s.WriteString(r.City)
-				s.WriteString("|")
-				s.WriteString(r.ISP)
-				s.WriteString("\n")
+				fmt.Fprintf(os.Stdout, "|- %2s%25s\n", r.Ip, r.Region)
 			}
 			if result.Error != nil {
-				s.WriteString("|-")
-				s.WriteString(result.Error.Error())
-				s.WriteString("\n")
+				fmt.Fprintf(os.Stderr, "|- ERROR: %s\n", result.Error.Error())
 			}
 		}
-		fmt.Println(s.String())
 	},
 }
 

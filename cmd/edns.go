@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -20,51 +20,23 @@ var ednsCmd = &cobra.Command{
 		domain, _ := cmd.Flags().GetString("domain")
 		qtype, _ := cmd.Flags().GetString("type")
 
-		s := strings.Builder{}
-		s.WriteString("Dns Server:\t")
-		s.WriteString(queryClient.DnsClient.GetServer())
-		s.WriteString("\n")
-		s.WriteString("Query:\t")
-		s.WriteString(qtype)
-		s.WriteString(" ")
-		s.WriteString(domain)
-		s.WriteString("\n\n")
+		fmt.Fprintf(os.Stdout, "Dns Server:\t%s\nQuery:\t%s %s\n\n", queryClient.DnsClient.GetServer(), qtype, domain)
 		for _, name := range args {
-			s.WriteString("* ")
-			s.WriteString(name)
-			s.WriteString("\n")
+			fmt.Fprintf(os.Stdout, "* %s\n", name)
 
 			for _, node := range subnetClieng.SearchGroupChildrenNodes(name) {
-				s.WriteString("|- * ")
-				s.WriteString(node.Name)
-				s.WriteString(" (edns_client_subnet=")
-				s.WriteString(node.Ip)
-				s.WriteString(")")
-				s.WriteString("\n")
+				fmt.Fprintf(os.Stdout, "|- * %s (edns_client_subnet=%s)\n", node.Name, node.Ip)
 
 				tempRst := queryClient.QueryWithSubnet(domain, qtype, node.Ip)
 				for _, ip := range tempRst.Info {
-					s.WriteString("|  |- ")
-					s.WriteString(ip.Country)
-					s.WriteString("|")
-					s.WriteString(ip.Region)
-					s.WriteString("|")
-					s.WriteString(ip.City)
-					s.WriteString("(")
-					s.WriteString(ip.IP)
-					s.WriteString(")")
-					s.WriteString("\n")
+					fmt.Fprintf(os.Stdout, "|  |- %s(%s)\n", ip.Region, ip.Ip)
 				}
 
 				if tempRst.Error != nil {
-					s.WriteString("   |- ")
-					s.WriteString(tempRst.Error.Error())
-					s.WriteString("\n")
+					fmt.Fprintf(os.Stderr, "ERROR: %s\n\n", tempRst.Error.Error())
 				}
 			}
-			s.WriteString("\n")
 		}
-		fmt.Println(s.String())
 	},
 }
 

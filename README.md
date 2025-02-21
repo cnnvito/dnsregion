@@ -13,7 +13,7 @@
 ### DOH
 
 ```bash
-./dnsregion dns --dns-server https://doh.pub/dns-query --use-doh www.google.com
+./dnsregion dns --dns-server https://doh.pub/dns-query www.google.com
 ```
 
 得到结果
@@ -28,7 +28,7 @@ DNS SERVER: https://dns.alidns.com/resolve
 ### DOT
 
 ```bash
-./dnsregion dns --dns-server 223.5.5.5 --use-tls www.google.com
+./dnsregion dns --dns-server tls://223.5.5.5 www.google.com
 ```
 
 得到结果

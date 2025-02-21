@@ -17,26 +17,13 @@ type IPParserRegion interface {
 	Parser(ip string) IPResult
 }
 type IPResult struct {
-	IP      string `json:"ip"`
-	Country string `json:"country"`
-	Region  string `json:"region"`
-	City    string `json:"city"`
-	ISP     string `json:"isp"`
+	Ip     string
+	Region string
 }
 
 func (i IPResult) String() string {
 	r, _ := json.Marshal(&i)
 	return string(r)
-}
-
-func newEmptyIPResult(ip string) IPResult {
-	return IPResult{
-		IP:      ip,
-		Country: "unknown",
-		Region:  "unknown",
-		City:    "unknown",
-		ISP:     "unknown",
-	}
 }
 
 func NewIPDatabase(db []byte) *IPDatabase {
@@ -52,24 +39,20 @@ type IPDatabase struct {
 }
 
 func (s *IPDatabase) Parser(ip string) IPResult {
-	result := newEmptyIPResult(ip)
 	r, err := s.SearchByStr(ip)
 	if err != nil {
-		return result
+		return IPResult{}
 	}
-
-	split := strings.SplitN(r, "|", 5)
-	result.Country = converEmpty(split[0])
-	result.Region = converEmpty(split[2])
-	result.City = converEmpty(split[3])
-	result.ISP = converEmpty(split[4])
-
-	return result
+	rs := []string{}
+	for _, el := range strings.Split(r, "|") {
+		rs = append(rs, converEmpty(el))
+	}
+	return IPResult{Ip: ip, Region: strings.Join(rs, "|")}
 }
 
 func converEmpty(str string) string {
 	if str == "0" || str == "" {
-		return "unknown"
+		return "N/A"
 	}
 	return str
 }

@@ -4,8 +4,8 @@ import "net"
 
 type DnsClientInterface interface {
 	GetServer() string
-	ResolveValues(domain, qtype string) ([]string, error)
-	ResolveValuesWithSubnet(domain, qtype, addr string) ([]string, error)
+	Lookup(domain, qtype string) ([]string, error)
+	LookupWithSubnet(domain, qtype, addr string) ([]string, error)
 }
 
 type DnsRegionResult struct {
@@ -56,7 +56,7 @@ type DnsRegionInterface struct {
 
 func (c *DnsRegionInterface) Query(domain, qtype string) DnsRegionResult {
 	var result DnsRegionResult
-	rst, err := c.DnsClient.ResolveValues(domain, qtype)
+	rst, err := c.DnsClient.Lookup(domain, qtype)
 	if err != nil {
 		result.Error = err
 		return result
@@ -68,7 +68,7 @@ func (c *DnsRegionInterface) Query(domain, qtype string) DnsRegionResult {
 
 func (c *DnsRegionInterface) QueryWithSubnet(domain, qtype, subnet string) DnsRegionResult {
 	var result DnsRegionResult
-	rst, err := c.DnsClient.ResolveValuesWithSubnet(domain, qtype, subnet)
+	rst, err := c.DnsClient.LookupWithSubnet(domain, qtype, subnet)
 	if err != nil {
 		result.Error = err
 		return result

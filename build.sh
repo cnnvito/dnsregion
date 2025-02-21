@@ -7,4 +7,4 @@ export GO111MODULE=on
 
 [ ! -d bin/ ] && mkdir bin/
 
-go build -trimpath -ldflags "-s -w" -o bin/dnsregion cmd/
+go build -trimpath -ldflags "-s -w" -o bin/dnsregion cmd/*
